@@ -2,3 +2,4 @@
 .idea
 target/
 upload/
+dependency-reduced-pom.xml
