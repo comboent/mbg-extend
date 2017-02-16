@@ -17,17 +17,25 @@ import static org.mybatis.generator.internal.util.StringUtility.isTrue;
 
 public class SimpleCommentGenerator implements CommentGenerator {
 
-    /** The properties. */
+    /**
+     * The properties.
+     */
     private Properties properties;
 
-    /** The suppress date. */
+    /**
+     * The suppress date.
+     */
     private boolean suppressDate;
 
-    /** The suppress all comments. */
+    /**
+     * The suppress all comments.
+     */
     private boolean suppressAllComments;
 
-    /** The addition of table remark's comments.
-     * If suppressAllComments is true, this option is ignored*/
+    /**
+     * The addition of table remark's comments.
+     * If suppressAllComments is true, this option is ignored
+     */
     private boolean addRemarkComments;
 
     private SimpleDateFormat dateFormat;
@@ -53,8 +61,7 @@ public class SimpleCommentGenerator implements CommentGenerator {
     /**
      * Adds a suitable comment to warn users that the element was generated, and when it was generated.
      *
-     * @param xmlElement
-     *            the xml element
+     * @param xmlElement the xml element
      */
     public void addComment(XmlElement xmlElement) {
     }
@@ -91,10 +98,8 @@ public class SimpleCommentGenerator implements CommentGenerator {
      * This method adds the custom javadoc tag for. You may do nothing if you do not wish to include the Javadoc tag -
      * however, if you do not include the Javadoc tag then the Java merge capability of the eclipse plugin will break.
      *
-     * @param javaElement
-     *            the java element
-     * @param markAsDoNotDelete
-     *            the mark as do not delete
+     * @param javaElement       the java element
+     * @param markAsDoNotDelete the mark as do not delete
      */
     protected void addJavadocTag(JavaElement javaElement,
                                  boolean markAsDoNotDelete) {
@@ -151,6 +156,27 @@ public class SimpleCommentGenerator implements CommentGenerator {
                                IntrospectedTable introspectedTable) {
     }
 
+    /**
+     * 判断是否为乱码
+     *
+     * @param str
+     * @return
+     */
+    private boolean isMessyCode(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 当从Unicode编码向某个字符集转换时，如果在该字符集中没有对应的编码，则得到0x3f（即问号字符?）
+            //从其他字符集向Unicode编码转换时，如果这个二进制数在该字符集中没有标识任何的字符，则得到的结果是0xfffd
+            //System.out.println("--- " + (int) c);
+            if ((int) c == 0xfffd) {
+                // 存在乱码
+                //System.out.println("存在乱码 " + (int) c);
+                return true;
+            }
+        }
+        return false;
+    }
+
     /* (non-Javadoc)
      * @see org.mybatis.generator.api.CommentGenerator#addFieldComment(org.mybatis.generator.api.dom.java.Field, org.mybatis.generator.api.IntrospectedTable, org.mybatis.generator.api.IntrospectedColumn)
      */
@@ -161,11 +187,17 @@ public class SimpleCommentGenerator implements CommentGenerator {
             return;
         }
 
+        String remarks = introspectedColumn.getRemarks();
+
+        if (!StringUtility.stringHasValue(remarks)) {
+            return;
+        }
+
         field.addJavaDocLine("/**"); //$NON-NLS-1$
 
-        String remarks = introspectedColumn.getRemarks();
-        if (addRemarkComments && StringUtility.stringHasValue(remarks)) {
-            String[] remarkLines = remarks.split(System.getProperty("line.separator"));  //$NON-NLS-1$
+        String lineSep = System.getProperty("line.separator");
+        if (StringUtility.stringHasValue(remarks)) {
+            String[] remarkLines = remarks.split(lineSep);  //$NON-NLS-1$
             for (String remarkLine : remarkLines) {
                 field.addJavaDocLine(" *   " + remarkLine);  //$NON-NLS-1$
             }
