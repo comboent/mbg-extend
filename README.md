@@ -9,5 +9,10 @@ MBG拓展
     * 复制mbg-extend-x.x.jar以及在src/main/resources目录下的gen.bat和mybatis-config.xml
     * 将以上三个文件放在同一个文件夹下
     * 修改mybatis-config.xml的相关配置，双击gen.bat，enjoy!
+
+
+测试一下图片
+-
+![](https://github.com/comboent/imgs/raw/master/test.png "这就是个测试哟")
     
 
